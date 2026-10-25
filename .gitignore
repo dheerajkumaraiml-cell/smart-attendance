@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE and editor
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build and cache
+dist/
+build/
+.cache/
+
+# Test coverage
+coverage/
+
+# Local database files
+*.sqlite
+*.db
+
+# Arduino IDE temporary files
+smart_attendance_firmware/**/build/
+smart_attendance_firmware/**/.pio/
