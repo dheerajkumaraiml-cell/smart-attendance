@@ -752,23 +752,18 @@ app.get('/students-template.csv', (req, res) => { res.attachment('students-templ
 //     app.listen(PORT, '0.0.0.0', () => console.log(`Smart Attendance: http://localhost:${PORT} | device API: POST /api/scan`));
 //   } catch (e) { console.error('MongoDB connection failed:', e.message); process.exit(1); }
 // })();
+let connPromise;
+const dbReady = () => connPromise || (connPromise = mongoose.connect(MONGO_URI));
+
+app.use(async (req, res, next) => {
+  try { await dbReady(); next(); }
+  catch (e) { res.status(500).json({ message: 'Database connection failed: ' + e.message }); }
+});
 
 if (process.env.VERCEL) {
-  mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB error:', err.message));
-
   module.exports = app;
 } else {
-  mongoose.connect(MONGO_URI)
-    .then(() => {
-      console.log('MongoDB connected');
-      app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Smart Attendance running on port ${PORT}`);
-      });
-    })
-    .catch(err => {
-      console.error('MongoDB connection failed:', err.message);
-      process.exit(1);
-    });
+  dbReady()
+    .then(() => app.listen(PORT, '0.0.0.0', () => console.log(`Running on port ${PORT}`)))
+    .catch(err => { console.error('MongoDB connection failed:', err.message); process.exit(1); });
 }
