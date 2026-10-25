@@ -242,6 +242,8 @@ const { parse } = require('csv-parse/sync');
 const fs = require('fs');
 const os = require('os');
 const { execFile } = require('child_process');
+require('dotenv').config();
+
 
 const PORT = Number(process.env.PORT || 9000);
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/smart_attendance';
@@ -751,42 +753,22 @@ app.get('/students-template.csv', (req, res) => { res.attachment('students-templ
 //   } catch (e) { console.error('MongoDB connection failed:', e.message); process.exit(1); }
 // })();
 
-let mongoPromise;
+if (process.env.VERCEL) {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB error:', err.message));
 
-async function connectDB() {
-  if (mongoose.connection.readyState === 1) {
-    return;
-  }
-
-  if (!mongoPromise) {
-    mongoPromise = mongoose.connect(MONGO_URI).catch((err) => {
-      mongoPromise = null;
-      throw err;
+  module.exports = app;
+} else {
+  mongoose.connect(MONGO_URI)
+    .then(() => {
+      console.log('MongoDB connected');
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Smart Attendance running on port ${PORT}`);
+      });
+    })
+    .catch(err => {
+      console.error('MongoDB connection failed:', err.message);
+      process.exit(1);
     });
-  }
-
-  await mongoPromise;
-}
-
-// Connect MongoDB before handling API requests
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
-    res.status(500).json({
-      message: 'Database connection failed',
-    });
-  }
-});
-
-// Vercel needs the Express app exported
-module.exports = app;
-
-// Run locally using: node server.js
-if (require.main === module) {
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Smart Attendance running on port ${PORT}`);
-  });
 }
