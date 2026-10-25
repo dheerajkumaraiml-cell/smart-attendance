@@ -743,10 +743,50 @@ app.post('/api/timetable/import', auth, adminOnly, upload.single('file'), h(asyn
 app.get('/students-template.csv', (req, res) => { res.attachment('students-template.csv').type('text/csv').send('uid,name,rollNo,className,group\n04 A3 1B 2C,Rahul Sharma,1,25MAM-2,B\n'); });
 
 /* ---------- start ---------- */
-(async () => {
+// (async () => {
+//   try {
+//     await mongoose.connect(MONGO_URI);
+//     console.log('MongoDB connected');
+//     app.listen(PORT, '0.0.0.0', () => console.log(`Smart Attendance: http://localhost:${PORT} | device API: POST /api/scan`));
+//   } catch (e) { console.error('MongoDB connection failed:', e.message); process.exit(1); }
+// })();
+
+let mongoPromise;
+
+async function connectDB() {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  if (!mongoPromise) {
+    mongoPromise = mongoose.connect(MONGO_URI).catch((err) => {
+      mongoPromise = null;
+      throw err;
+    });
+  }
+
+  await mongoPromise;
+}
+
+// Connect MongoDB before handling API requests
+app.use(async (req, res, next) => {
   try {
-    await mongoose.connect(MONGO_URI);
-    console.log('MongoDB connected');
-    app.listen(PORT, '0.0.0.0', () => console.log(`Smart Attendance: http://localhost:${PORT} | device API: POST /api/scan`));
-  } catch (e) { console.error('MongoDB connection failed:', e.message); process.exit(1); }
-})();
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('MongoDB connection failed:', error.message);
+    res.status(500).json({
+      message: 'Database connection failed',
+    });
+  }
+});
+
+// Vercel needs the Express app exported
+module.exports = app;
+
+// Run locally using: node server.js
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Smart Attendance running on port ${PORT}`);
+  });
+}
