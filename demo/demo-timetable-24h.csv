@@ -6,7 +6,7 @@ className,day,startTime,endTime,subject,room,teacherCodes,teachers,type,groups
 25MAM-2,Monday,04:00,04:50,Cloud Computing,R101,E22041,Mr. Arjun Mehta,lecture,
 25MCA-1,Monday,05:00,05:50,Computer Networks,R101,E22041,Mr. Arjun Mehta,lecture,
 25MAM-2,Monday,06:00,06:50,Data Structures,R101,E7981,Dr. Bachandeep Singh Bhathal,lecture,
-25MCA-1,Monday,07:00,07:50,Machine Learning,R101,E7981,Dr. Bachandeep Singh Bhathal,lecture,
+25MCA-1,Monday,15:00,15:59,Machine Learning,R101,E7981,Dr. Bachandeep Singh Bhathal,lecture,
 25MAM-2,Monday,08:00,08:50,Database Systems,R101,E15037,Prof. Simran Kaur,lecture,
 25MCA-1,Monday,09:00,09:50,Web Development,R101,E15037,Prof. Simran Kaur,lecture,
 25MAM-2,Monday,10:00,10:50,Cloud Computing,R101,E22041,Mr. Arjun Mehta,lecture,
